@@ -4,19 +4,19 @@
     "description": "Pomodoro Logger -- When a time logger meets Pomodoro and Kanban board",
     "main": "./dist/main.js",
     "scripts": {
-        "build-main": "cross-env NODE_ENV=production webpack --config webpack.main.prod.config.js",
-        "build-renderer": "cross-env NODE_ENV=production webpack --config webpack.renderer.prod.config.js",
-        "prebuild": "rm -rf ./dist",
+        "build-main": "cross-env NODE_ENV=production node --openssl-legacy-provider ./node_modules/webpack/bin/webpack.js --config webpack.main.prod.config.js",
+        "build-renderer": "cross-env NODE_ENV=production node --openssl-legacy-provider ./node_modules/webpack/bin/webpack.js --config webpack.renderer.prod.config.js",
+        "prebuild": "rimraf dist",
         "build": "concurrently \"npm:build-main\" \"npm:build-renderer\"",
-        "start-renderer-dev": "cross-env NODE_ENV=development webpack-dev-server --config webpack.renderer.dev.config.js",
-        "start-main-dev": "webpack --config webpack.main.config.js",
+        "start-renderer-dev": "cross-env NODE_ENV=development node --openssl-legacy-provider ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config webpack.renderer.dev.config.js",
+        "start-main-dev": "node --openssl-legacy-provider ./node_modules/webpack/bin/webpack.js --config webpack.main.config.js",
         "start-electron": "electron .",
         "start": "concurrently \"npm:start-main-dev\" \"npm:start-renderer-dev\"",
         "prestart:prod": "npm run build",
         "start:prod": "electron .",
         "lint": "tslint '{src,test,mocks}/**/*.{ts,tsx}' --project ./tsconfig.json",
         "test": "jest --forceExit --detectOpenHandles",
-        "posttest": "rm -rf ./__test__db",
+        "posttest": "rimraf __test__db",
         "pretest:e2e": "npm run build",
         "test:e2e": "jest '(\\/test\\/e2e/).*'",
         "pack": "npm run build && electron-builder --dir",
@@ -26,7 +26,7 @@
         "dist-all": "npm run build && electron-builder -mwl",
         "postinstall": "electron-builder install-app-deps",
         "style": "styleguidist server",
-        "style-pack": "webpack --config webpack.style.js "
+        "style-pack": "node --openssl-legacy-provider ./node_modules/webpack/bin/webpack.js --config webpack.style.js "
     },
     "husky": {
         "hooks": {
@@ -163,7 +163,7 @@
         "native-ext-loader": "^2.3.0",
         "nedb": "^1.8.0",
         "node-gyp": "^9.0.0",
-        "node-sass": "^7.0.0",
+        "sass": "^1.99.0",
         "prettier": "^2.0.2",
         "prop-types": "^15.7.2",
         "react": "^16.8.6",
@@ -177,7 +177,7 @@
         "react-stack-grid": "^0.7.1",
         "react-styleguidist": "^11.0.8",
         "react-test-renderer": "^16.8.6",
-        "react-trend": "zxch3n/react-trend",
+        "react-trend": "^1.2.5",
         "redux": "^4.0.1",
         "redux-devtools-extension": "^2.13.5",
         "redux-thunk": "^2.3.0",
@@ -206,8 +206,7 @@
     },
     "dependencies": {
         "@electron/remote": "^2.0.8",
-        "active-win": "^7.7.2",
-        "node-mac-permissions": "^2.2.0"
+        "active-win": "^7.7.2"
     },
     "resolutions": {
         "node-ipc": "9.1.1"

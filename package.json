@@ -45,7 +45,7 @@
     },
     "build": {
         "afterSign": "electron-builder-notarize",
-        "productName": "Pomodoro Logger",
+        "productName": "test",
         "appId": "com.github.rem2016.pomodoro-logger",
         "publish": {
             "provider": "github",

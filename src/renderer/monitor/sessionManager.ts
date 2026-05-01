@@ -3,10 +3,8 @@ import { PomodoroRecord } from './type';
 import { dbBaseDir } from '../../config';
 import * as fs from 'fs';
 import nedb from 'nedb';
-import { ipcRenderer } from 'electron';
 
 const dbWorkers = workers.dbWorkers;
-const syncSessionsEvent = 'sync-sessions';
 export function renameIllegalName(record: PomodoroRecord) {
     for (const app in record.apps) {
         const appRow = record.apps[app];
@@ -62,13 +60,11 @@ export async function addSession(record: PomodoroRecord) {
     }
     // @ts-ignore
     await dbWorkers.sessionDB.insert(record).catch((err) => console.error(err));
-    ipcRenderer.send(syncSessionsEvent);
 }
 
 export async function removeSession(startTime: number) {
     // @ts-ignore
     await dbWorkers.sessionDB.remove({ startTime });
-    ipcRenderer.send(syncSessionsEvent);
 }
 
 export async function getTodaySessions(): Promise<PomodoroRecord[]> {

@@ -4,18 +4,9 @@ import { promisify } from 'util';
 import { dbBaseDir, dbPaths } from '../config';
 import { AsyncDB } from '../utils/dbHelper';
 import { DBs, loadDBs } from './db';
-import type { PomodoroRecord } from '../renderer/monitor/type';
 import type { Card, KanbanBoard, List } from '../renderer/components/Kanban/type';
 
-const sessionsExportPath = join(dbBaseDir, 'sessions.json');
 const tasksExportPath = join(dbBaseDir, 'tasks.json');
-
-type SessionExport = {
-    version: number;
-    exportedAt: number;
-    sessions: PomodoroRecord[];
-    total: number;
-};
 
 type CardExport = {
     _id: string;
@@ -45,21 +36,6 @@ type TasksExport = {
     exportedAt: number;
     boards: BoardExport[];
 };
-
-export async function exportSessions() {
-    await loadDBs();
-    const sessions = (await new AsyncDB(DBs.sessionDB).find({}, {})) as PomodoroRecord[];
-    sessions.sort((a, b) => a.startTime - b.startTime);
-    const data: SessionExport = {
-        sessions,
-        version: 1,
-        exportedAt: Date.now(),
-        total: sessions.length,
-    };
-    await promisify(writeFile)(sessionsExportPath, JSON.stringify(data, null, 2), {
-        encoding: 'utf-8',
-    });
-}
 
 export async function exportTasks() {
     await loadDBs();
@@ -109,14 +85,6 @@ export async function exportTasks() {
     await promisify(writeFile)(tasksExportPath, JSON.stringify(data, null, 2), {
         encoding: 'utf-8',
     });
-}
-
-export async function exportAll() {
-    await Promise.all([exportSessions(), exportTasks()]);
-}
-
-export function getSessionExportPath() {
-    return sessionsExportPath;
 }
 
 export function getTasksExportPath() {

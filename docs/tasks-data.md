@@ -80,3 +80,4 @@
 
 - `tasks.json` 是面向任务视图的聚合结果，推荐外部程序优先读取它。
 - 不建议直接读取 `cards.nedb` / `lists.nedb` / `kanban.nedb`（内部日志格式）。
+- 应用不再生成 `sessions.json`；若需要番茄钟明细，请读 `session.nedb`（NeDB 格式）或使用应用内导出 JSON 功能。

@@ -8,7 +8,41 @@ const appdataDir =
     (process.platform === 'darwin'
         ? process.env.HOME + '/Library/Preferences'
         : process.env.HOME + '/.local/share');
-export const baseDir = join(appdataDir, 'PomodoroLogger');
+
+/** Fallback when not running from a packaged app (development / unpacked `electron .`). */
+const fallbackUserDataDir = join(appdataDir, 'PomodoroLogger');
+
+/**
+ * Packaged app: persist under the install/root folder (writable if install path is writable).
+ * Uses `resourcesPath` so main, renderer and Web Workers resolve the same path without ipc.
+ *
+ * macOS: `*.app/Contents/Resources` → go up two levels to the `.app` folder.
+ */
+function packagedBaseBesideInstall(): string {
+    const resourcesPath = process.resourcesPath;
+    if (resourcesPath) {
+        const installRoot =
+            process.platform === 'darwin'
+                ? dirname(dirname(resourcesPath))
+                : dirname(resourcesPath);
+        return join(installRoot, 'PomodoroLogger');
+    }
+    try {
+        // Fallback if `resourcesPath` is missing but we're still packaged.
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { app } = require('electron') as typeof import('electron');
+        if (app?.isPackaged) {
+            return join(dirname(app.getPath('exe')), 'PomodoroLogger');
+        }
+    } catch {
+        /* not Electron */
+    }
+
+    return fallbackUserDataDir;
+}
+
+export const baseDir =
+    process.env.NODE_ENV === 'production' ? packagedBaseBesideInstall() : fallbackUserDataDir;
 if (!existsSync(baseDir)) {
     mkdirSync(baseDir);
 }

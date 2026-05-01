@@ -7,6 +7,7 @@ import { writeAllFile } from '../io/write';
 import { restart, win } from '../init';
 import { readAllData } from '../io/read';
 import { activeWin } from '../activeWin';
+import { exportAll } from '../sessionExporter';
 
 /**
  * token is used to identify the sender of the message
@@ -118,6 +119,7 @@ export function initialize() {
 
         // TODO: Show Warning
         await writeAllFile(merged.payload.merged);
+        await exportAll();
         restart();
     });
 }

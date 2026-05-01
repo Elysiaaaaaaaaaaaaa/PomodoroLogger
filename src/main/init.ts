@@ -11,10 +11,12 @@ import { initialize } from './ipc/ipc';
 import { IpcEventName } from './ipc/type';
 import * as remoteMain from '@electron/remote/main';
 import { initActiveWin } from './activeWin';
+import { exportAll, watchTaskFiles } from './sessionExporter';
 remoteMain.initialize();
 
 const { refreshDbs, loadDBs } = db;
 export let win: BrowserWindow | undefined;
+const syncSessionsEvent = 'sync-sessions';
 
 export const gotTheLock = process.env.NODE_ENV !== 'production' || app.requestSingleInstanceLock();
 
@@ -182,6 +184,8 @@ app.on('ready', async () => {
     }
 
     await createWindow();
+    await exportAll().catch((err) => console.error('failed to export sessions', err));
+    watchTaskFiles();
 
     db.DBs.settingDB.findOne({ name: 'setting' }, (err, settings) => {
         if (err) {
@@ -195,6 +199,9 @@ app.on('ready', async () => {
 
         update();
     });
+});
+ipcMain.on(syncSessionsEvent, () => {
+    exportAll().catch((err) => console.error('failed to sync sessions', err));
 });
 
 export function restart(): void {

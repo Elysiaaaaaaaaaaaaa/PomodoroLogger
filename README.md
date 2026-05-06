@@ -19,10 +19,11 @@
   </a>
 </p>
 
-
+# new works on the original PomodoroLogger
+- solve the issue: the total time shows wrongly at the history page, when the project fliter was selected.
+- add a json to show the task cards to other programme.
 
 # Pomodoro Logger :clock930:
-
 
 > **Invest your time easily**
 

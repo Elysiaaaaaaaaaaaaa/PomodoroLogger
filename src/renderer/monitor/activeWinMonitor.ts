@@ -8,6 +8,7 @@ export class Monitor {
     listener: ActiveWinListener;
     screenshotInterval: number | undefined;
     shouldTakeScreenshot: boolean = false;
+    private missingActiveWinCount: number = 0;
     constructor(
         listener: ActiveWinListener,
         interval: number = 5000,
@@ -39,19 +40,37 @@ export class Monitor {
     };
 
     watch = async () => {
-        const data = await window.api.activeWin();
-        if (data) {
-            try {
-                if (this.shouldTakeScreenshot) {
-                    this.shouldTakeScreenshot = false;
-                    const screenshot = await getScreen(500);
-                    this.listener(data, screenshot);
-                } else {
-                    this.listener(data);
-                }
-            } catch (e) {
-                console.error(e);
+        let data: BaseResult | undefined;
+        try {
+            data = await window.api.activeWin();
+        } catch (e) {
+            console.warn('Cannot read active window.', e);
+        }
+
+        if (!data) {
+            this.missingActiveWinCount += 1;
+            if (this.missingActiveWinCount === 1 || this.missingActiveWinCount % 60 === 0) {
+                console.warn('Active window data is unavailable; app usage will not be recorded.');
             }
+            return;
+        }
+
+        this.missingActiveWinCount = 0;
+        if (this.shouldTakeScreenshot) {
+            this.shouldTakeScreenshot = false;
+            try {
+                const screenshot = await getScreen(500);
+                this.listener(data, screenshot);
+                return;
+            } catch (e) {
+                console.warn('Cannot take screenshot; app usage will still be recorded.', e);
+            }
+        }
+
+        try {
+            this.listener(data);
+        } catch (e) {
+            console.error(e);
         }
     };
 

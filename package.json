@@ -1,6 +1,6 @@
 {
     "name": "pomodoro-logger",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "description": "Pomodoro Logger -- When a time logger meets Pomodoro and Kanban board",
     "main": "./dist/main.js",
     "scripts": {
@@ -19,8 +19,8 @@
         "posttest": "rimraf __test__db",
         "pretest:e2e": "npm run build",
         "test:e2e": "jest '(\\/test\\/e2e/).*'",
-        "pack": "npm run build && electron-builder --dir",
-        "dist-win": "npm run build && electron-builder --windows -p onTagOrDraft",
+        "pack": "npm run build && electron-builder --dir --publish never",
+        "dist-win": "npm run build && electron-builder --windows --dir --publish never",
         "dist-mac": "npm run build && electron-builder --mac -p onTagOrDraft",
         "dist-linux": "npm run build && electron-builder --linux -p onTagOrDraft",
         "dist-all": "npm run build && electron-builder -mwl",

@@ -15,6 +15,7 @@ export class UsageRecorder {
     private lock: boolean = false;
     private maxIndex: number = 0;
     private lastUpdateTime: number | undefined = undefined;
+    private hasWarnedNoAppData: boolean = false;
     public isRunning: boolean = false;
 
     private lastScreenShotUrl?: string;
@@ -40,6 +41,7 @@ export class UsageRecorder {
         }
 
         this.normalizeTitleSpentTime();
+        this.warnIfSessionHasNoAppData();
         return cloneDeep(this.record);
     }
 
@@ -57,6 +59,7 @@ export class UsageRecorder {
         this.maxIndex = 0;
         this.isRunning = false;
         this.lastUpdateTime = undefined;
+        this.hasWarnedNoAppData = false;
     };
 
     start = () => {
@@ -205,6 +208,19 @@ export class UsageRecorder {
             for (const title in titles) {
                 titles[title].normalizedWeight = titles[title].occurrence / totalTitleOccurrences;
             }
+        }
+    };
+
+    private warnIfSessionHasNoAppData = () => {
+        if (
+            !this.hasWarnedNoAppData &&
+            this.record.spentTimeInHour > 0 &&
+            Object.keys(this.record.apps).length === 0
+        ) {
+            console.warn(
+                'Pomodoro session has elapsed time but no app usage data. Active window monitoring may be unavailable.'
+            );
+            this.hasWarnedNoAppData = true;
         }
     };
 }

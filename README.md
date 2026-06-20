@@ -93,6 +93,34 @@ Win10 / macOS / Linux
 
 To download, go to [release page](https://github.com/rem2016/PomodoroLogger/releases).
 
+## Local Development
+
+This project is an Electron app. Use Node.js 16 if possible, as the project is configured for an older Electron/Webpack stack.
+
+Install dependencies:
+
+```powershell
+yarn install
+```
+
+Start the renderer and main-process webpack watchers:
+
+```powershell
+npm start
+```
+
+When the renderer dev server is running at `http://localhost:2003/` and the main process has finished compiling, open a second terminal in the project directory and start Electron:
+
+```powershell
+npm run start-electron
+```
+
+If Electron reports that it failed to install correctly, rebuild the local Electron binary files:
+
+```powershell
+node node_modules\electron\install.js
+```
+
 
 # Contribution
 

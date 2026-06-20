@@ -20,8 +20,8 @@ function createResult(appName: string, title: string = appName) {
         owner: {
             name: appName,
             path: `/path/to/${appName}.exe`,
-            processId: 123
-        }
+            processId: 123,
+        },
     };
 }
 
@@ -170,7 +170,7 @@ describe('monitor/UsageRecorder', () => {
         expect(recorder.sessionData.stayTimeInSecond).toStrictEqual([20, 10, 10, 40, 10, 10]);
         expect(recorder.sessionData.screenshots).toStrictEqual([
             { time: 70000, path: 'sss.jpg' },
-            { time: 100000, path: '111.jpg' }
+            { time: 100000, path: '111.jpg' },
         ]);
     });
 
@@ -190,5 +190,21 @@ describe('monitor/UsageRecorder', () => {
         expect(recorder.sessionData.switchActivities!.length).toBe(0);
         expect(recorder.sessionData.stayTimeInSecond!.length).toBe(0);
         expect(recorder.sessionData.efficiency).toBeUndefined();
+    });
+
+    it('warns when a timed session ends without app usage data', async () => {
+        const recorder = new UsageRecorder(() => {});
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+        mockDate(0);
+        recorder.start();
+        mockDate(100000);
+        recorder.stop();
+        recorder.sessionData;
+
+        expect(warn).toHaveBeenCalledWith(
+            'Pomodoro session has elapsed time but no app usage data. Active window monitoring may be unavailable.'
+        );
+        warn.mockRestore();
     });
 });
